@@ -56,15 +56,15 @@ class DOCLoader:
 
 
 
-# Example usage
-file_path = 'data/Selections.pdf'
-pdf_loader = PDFLoader(file_path)
+# # Example usage
+# file_path = 'data/Selections.pdf'
+# pdf_loader = PDFLoader(file_path)
 
-# Extract text
-# text = pdf_loader.extract_plumber_text()
-text = pdf_loader.extract_reader_text()
-print("Extracted Text:")
-print(text)
+# # Extract text
+# # text = pdf_loader.extract_plumber_text()
+# text = pdf_loader.extract_reader_text()
+# print("Extracted Text:")
+# print(text)
 
 # # Extract table
 # table = pdf_loader.extract_table()
