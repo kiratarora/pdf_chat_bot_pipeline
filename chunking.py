@@ -12,8 +12,18 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import sent_tokenize, word_tokenize
+import string
+from gensim import corpora, models
+
 from loader import PDFLoader,DOCLoader
 import math
+
+# nltk.download('punkt')
+# nltk.download('stopwords')
 
 class Chunker:
         'Function to clean the data in the chunks'
@@ -122,13 +132,60 @@ class Chunker:
                 
                 return chunks
 
+        '''
+        This function takes the data, splits it based distict on topics. 
+
+        Parameters:
+                raw_data (str): data to be chunked
+                num_topics (int): the number of topics for the lda model
+                passes (int): number of passes for the lda model
+        Returns:
+                list of strings: chunked data
+        '''
+        def topic_based_chunking(self, raw_data, num_topics = 5, passes = 15):
+                # Preprocessing Data
+                sentences = sent_tokenize(raw_data)
+                stop_words = set(stopwords.words('english'))
+                preprocessed_data = [] # 2-D array with the list of preprocessed words
+                for sentence in sentences:
+                        words = word_tokenize(sentence.lower())
+                        words = [word for word in words if word.isalpha() and word not in stop_words]
+                        preprocessed_data.append(words)
+                # Vectorizing the data
+                dictionary = corpora.Dictionary(preprocessed_data)
+                corpus = [dictionary.doc2bow(sentence) for sentence in preprocessed_data]
+                lda_model = models.LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=passes)
+                # Distribution based on topics
+                sentence_topics = []
+                for bow in corpus:
+                        topic_distribution = lda_model.get_document_topics(bow)
+                        dominant_topic = max(topic_distribution, key=lambda x: x[1])[0]
+                        sentence_topics.append(dominant_topic)
+                # Chunking
+                chunks = []
+                current_chunk = [sentences[0]]
+                current_topic = sentence_topics[0]
+                
+                for i in range(1, len(sentences)):
+                        if sentence_topics[i] == current_topic:
+                                current_chunk.append(sentences[i])
+                        else:
+                                chunks.append(' '.join(current_chunk))
+                                current_chunk = [sentences[i]]
+                                current_topic = sentence_topics[i]
+                
+                if current_chunk:
+                        chunks.append(' '.join(current_chunk))
+                
+                return chunks
+
 
 # loader = PDFLoader('data/attention_is_all_you_need.pdf')
 loader = PDFLoader('data/selections.pdf')
 # text = loader.extract_plumber_text()
 text = loader.extract_reader_text()
 chunker = Chunker()
-chunks = chunker.semantic_chunking(text)
+chunks = chunker.topic_based_chunking(text)
 # for i in chunks:
 #         print('--------------------------------------------')
 #         print(i)
