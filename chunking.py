@@ -9,11 +9,22 @@
         > Topic Based Chunking ()
 
 '''
-
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 from loader import PDFLoader,DOCLoader
 import math
 
 class Chunker:
+        'Function to clean the data in the chunks'
+        def _data_cleaner(self,data,chars_to_remove):
+                for i in range(len(data)):
+                        data[i] = data[i].rstrip()
+                        data[i] = data[i].lstrip()
+                        for chars in chars_to_remove:
+                                data[i] = data[i].replace(chars,'')
+                return data
+
         def __init__(self):
                 self.chunks = []
         
@@ -63,9 +74,12 @@ class Chunker:
         Returns:
                 list of strings: list of chunked data
         '''
-        def paragraph_chunking(self,data,size = 2500, delimiter = '\n'):  
+        def paragraph_chunking(self,data,size = 2500, delimiter = '\n', add_back_delimiter = False):  
                 chunks = data.split(delimiter)
                 chunks = [i for i in chunks if i!=' '] # removing all the empty characters
+                if add_back_delimiter:
+                        for chunk in range(len(chunks)):
+                                chunks[chunk] = chunks[chunk] + delimiter
                 # Checking to see if there are any chunks greater than 3000 characters, and if there are, we will split them in half
                 limited_chunks = []
                 for chunk in chunks:
@@ -77,20 +91,49 @@ class Chunker:
                                         limited_chunks.append(i)
                         else:
                                 limited_chunks.append(chunk)
-                return limited_chunks
+                return self._data_cleaner(limited_chunks, ['\n'])
                 
+        '''
+        This function splits the data based on semantic context. 
+        The first step is to split the entire data into smaller chunks or tokens and then doing a semantic analysis to finally group the tokens into semantically similar chunks.
+
+        Parameters: 
+                data (str): this is a string of characters representing the whole data.
+                chunk_size (int): the size of the chunk meaning the number of tokens in a chunk
+                chunk_similarity_threshold (float): the similarity threshold for the tokens to be chunked
+        
+        Returns:
+                list of strings: retuns a list of strings reprensing the chunked data.
+        '''
+        def semantic_chunking(self,data,delimiter='.', chunk_size = 4, chunk_similarity_threshold = 0.3):
+                sentences = self.paragraph_chunking(data=data, delimiter=delimiter, add_back_delimiter=True)
+                vectorizer = TfidfVectorizer()
+                tfidf_matrix = vectorizer.fit_transform(sentences)
+                similarity_matrix = cosine_similarity(tfidf_matrix)
+                
+                chunks = []
+                for i in range(0, len(sentences), chunk_size):
+                        chunk_sentences = sentences[i:i + chunk_size]
+                        chunk_similarity = similarity_matrix[i:i + chunk_size, i:i + chunk_size]
+                        avg_similarity = np.mean(chunk_similarity)
+                        print(avg_similarity)
+                        if avg_similarity > chunk_similarity_threshold: 
+                                chunks.append(' '.join(chunk_sentences))
+                
+                return chunks
 
 
-
-loader = PDFLoader('data/attention_is_all_you_need.pdf')
-# loader = PDFLoader('data/selections.pdf')
+# loader = PDFLoader('data/attention_is_all_you_need.pdf')
+loader = PDFLoader('data/selections.pdf')
+# text = loader.extract_plumber_text()
 text = loader.extract_reader_text()
 chunker = Chunker()
-chunks = chunker.paragraph_chunking(text)
+chunks = chunker.semantic_chunking(text)
 # for i in chunks:
 #         print('--------------------------------------------')
 #         print(i)
 #         print('--------------------------------------------')
+print(chunks)
 print(len(chunks))
 
         
