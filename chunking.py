@@ -19,11 +19,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 import string
 from gensim import corpora, models
 
-from loader import PDFLoader,DOCLoader
 import math
-
-# nltk.download('punkt')
-# nltk.download('stopwords')
 
 class Chunker:
         'Function to clean the data in the chunks'
@@ -185,20 +181,14 @@ class Chunker:
         def hybrid_chunking():
                 return None
 
-# loader = PDFLoader('data/attention_is_all_you_need.pdf')
-loader = PDFLoader('data/selections.pdf')
-# text = loader.extract_plumber_text()
-text = loader.extract_reader_text()
-chunker = Chunker()
-chunks = chunker.topic_based_chunking(text)
-# for i in chunks:
-#         print('--------------------------------------------')
-#         print(i)
-#         print('--------------------------------------------')
-print(chunks)
-print(len(chunks))
 
-        
+def setup():
+        nltk.download('punkt')
+        nltk.download('stopwords')
+# # _____________________________________________________________________________________
+# setup() # Uncomment this function to setup the downloads required to run the function
+# # _____________________________________________________________________________________
+
 
 # step 1: loading the data
 # step 2: chunking the data
