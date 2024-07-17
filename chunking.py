@@ -179,6 +179,11 @@ class Chunker:
                 
                 return chunks
 
+        '''
+        This is a hybrid function that tokenizes the data, then chunks it by joining all the related sentences togeter irrespecive of it's original position. 
+        '''
+        def hybrid_chunking():
+                return None
 
 # loader = PDFLoader('data/attention_is_all_you_need.pdf')
 loader = PDFLoader('data/selections.pdf')
