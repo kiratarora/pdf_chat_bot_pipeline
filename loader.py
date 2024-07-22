@@ -73,9 +73,9 @@ class DOCLoader:
 
 
 # # Example usage
-file_path = 'data/Selections.pdf'
-pdf_loader = PDFLoader(file_path)
-pdf_loader.parse_data()
+# file_path = 'data/Selections.pdf'
+# pdf_loader = PDFLoader(file_path)
+# pdf_loader.parse_data()
 # # Extract text
 # # text = pdf_loader.extract_plumber_text()
 # text = pdf_loader.extract_reader_text()

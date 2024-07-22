@@ -122,7 +122,6 @@ class Chunker:
                         chunk_sentences = sentences[i:i + chunk_size]
                         chunk_similarity = similarity_matrix[i:i + chunk_size, i:i + chunk_size]
                         avg_similarity = np.mean(chunk_similarity)
-                        print(avg_similarity)
                         if avg_similarity > chunk_similarity_threshold: 
                                 chunks.append(' '.join(chunk_sentences))
                 
@@ -138,9 +137,9 @@ class Chunker:
         Returns:
                 list of strings: chunked data
         '''
-        def topic_based_chunking(self, raw_data, num_topics = 5, passes = 15):
+        def topic_based_chunking(self, data, num_topics = 5, passes = 15):
                 # Preprocessing Data
-                sentences = sent_tokenize(raw_data)
+                sentences = sent_tokenize(data)
                 stop_words = set(stopwords.words('english'))
                 preprocessed_data = [] # 2-D array with the list of preprocessed words
                 for sentence in sentences:
@@ -182,7 +181,7 @@ class Chunker:
                 return None
 
         def best_chunks(self, data):
-                return self.topic_based_chunking(raw_data=data)
+                return self.topic_based_chunking(data=data)
 
 def setup():
         nltk.download('punkt')

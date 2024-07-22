@@ -4,17 +4,6 @@ from chunking import Chunker
 from embedder import Embedder
 import json
 
-# # # loader = PDFLoader('data/attention_is_all_you_need.pdf')
-# loader = PDFLoader('data/Selections.pdf')
-# text = loader.extract_reader_text()
-# chunker = Chunker()
-# chunks = chunker.topic_based_chunking(text)
-
-# embedder = Embedder()
-# embeded_data = embedder.get_text_embedding(chunks)
-# for i in embeded_data:
-#     print(len(i))
-
 class Vector_Store():
     def __init__(self, files:str) -> None:
         self.files = files
@@ -67,7 +56,7 @@ class Vector_Store():
         return extention[-1]
 
     def add_sigle_file(self,file_name):
-        print(self._process_files_helper(flag = True, files = [file_name]))
+        return self._process_files_helper(flag = True, files = [file_name])
 
-vector = Vector_Store(['data/Selections.pdf'])
-vector.add_sigle_file('data/Selections.pdf')
+    def get_query_embedding(self,string):
+        return self.embedder.get_query_embedding(string)
