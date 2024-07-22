@@ -181,7 +181,7 @@ class Chunker:
                 return None
 
         def best_chunks(self, data):
-                return self.topic_based_chunking(data=data)
+                return self.semantic_chunking(data=data)
 
 def setup():
         nltk.download('punkt')

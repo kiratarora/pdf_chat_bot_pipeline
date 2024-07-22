@@ -36,7 +36,7 @@ class Vector_Store():
                 if doc_type == 'pdf':
                     loader = PDFLoader(file)
                     data_reader = loader.parse_data()
-                elif doc_type == 'doc':
+                elif doc_type == 'docx':
                     loader = DOCLoader(file)
                     data_reader = loader.get_text()
                 else: # Add more loaders
