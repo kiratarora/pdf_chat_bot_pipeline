@@ -1,8 +1,8 @@
-import pdfplumber
 from pypdf import PdfReader 
+import pdfplumber
 from spire.doc import *
 from spire.doc.common import *
-import io
+import io, re, math
 
 class PDFLoader:
     def __init__(self, file_path):
@@ -30,7 +30,23 @@ class PDFLoader:
             text += page.extract_text()
         return text
 
-
+    def parse_data(self):
+        data_reader = self.extract_reader_text()
+        data_plumber = self.extract_plumber_text()
+        # len (more), chars [#,>,\n] (less)
+        def count_chars(input_string):
+            return len(re.findall(r'[!@#$%^&*()_+{}\[\]:;<>,.?\\/-]', input_string))
+        reader_chars, plumber_chars = count_chars(data_reader),count_chars(data_plumber)
+        if abs(reader_chars-plumber_chars) <= 20:
+            if len(data_plumber)<len(data_reader):
+                return data_reader 
+            else:
+                return data_plumber
+        if reader_chars > plumber_chars:
+            return data_reader
+        else:
+            return data_plumber
+                 
 class DOCLoader:
     def __init__(self, file_path):
         self.file_path = file_path
@@ -57,9 +73,9 @@ class DOCLoader:
 
 
 # # Example usage
-# file_path = 'data/Selections.pdf'
-# pdf_loader = PDFLoader(file_path)
-
+file_path = 'data/Selections.pdf'
+pdf_loader = PDFLoader(file_path)
+pdf_loader.parse_data()
 # # Extract text
 # # text = pdf_loader.extract_plumber_text()
 # text = pdf_loader.extract_reader_text()
