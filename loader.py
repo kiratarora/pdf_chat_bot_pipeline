@@ -1,8 +1,6 @@
+import pdfplumber, re
 from pypdf import PdfReader 
-import pdfplumber
-from spire.doc import *
-from spire.doc.common import *
-import io, re, math
+from docx import Document
 
 class PDFLoader:
     def __init__(self, file_path):
@@ -50,20 +48,30 @@ class PDFLoader:
 class DOCLoader:
     def __init__(self, file_path):
         self.file_path = file_path
-        self.document = Document()
-        self.document.LoadFromFile(self.file_path)
+        self.document = Document(file_path)
         
     def get_text(self):
-        return self.document.GetText()
+        text_list = [para.text for para in self.document.paragraphs]
+        text = ''
+        for i in text_list:
+            text += i + '\n'
+        return text
 
-    def get_table(self): #FIXME: The table extraction is not working with this library, might need to change it to find one that works and will have to switch text extraction to that module as well.
+    def get_table(self):
+        # Initialize a list to hold all tables
         tables_data = []
-        for section in range(self.document.Sections.Count):
-            for table in range(self.document.Sections[section].Tables.Count):
-                temporary_table = []
-                for row in range(self.document.Sections[section].Tables[table].Rows.Count):
-                    print(self.document.Sections[section].Tables[table].Rows[row].Cells[0])
+        
+        # Iterate through each table in the document
+        for table in self.document.tables:
+            table_data = []
+            for row in table.rows:
+                row_data = [cell.text.strip() for cell in row.cells]
+                table_data.append(row_data)
+            tables_data.append(table_data)
+        
+        return tables_data
 
+        
             
         
 
@@ -72,10 +80,10 @@ class DOCLoader:
 
 
 
-# # Example usage
-# file_path = 'data/Selections.pdf'
-# pdf_loader = PDFLoader(file_path)
-# pdf_loader.parse_data()
+# Example usage
+file_path = 'data/gurgaon.pdf'
+pdf_loader = PDFLoader(file_path)
+pdf_loader.parse_data()
 # # Extract text
 # # text = pdf_loader.extract_plumber_text()
 # text = pdf_loader.extract_reader_text()
@@ -83,10 +91,13 @@ class DOCLoader:
 # print(text)
 
 # # Extract table
-# table = pdf_loader.extract_table()
-# print("Extracted Table:")
-# print(table[0])
+tables = pdf_loader.extract_table()
+for i in tables:
+    print(i)
 
 # file_path = 'data/Transcript -   Understanding your Electricity Bills.docx'
 # doc_loader = DOCLoader(file_path)
-# print(doc_loader.get_text())
+# # print(doc_loader.get_text())
+# tables = doc_loader.get_table()
+# for i in tables:
+#     print(i)

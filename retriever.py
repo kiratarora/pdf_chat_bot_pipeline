@@ -10,7 +10,6 @@ class Retriever():
 
     def get_context(self,querry):
         # Processing the files to get the data
-        print("Processing files, running may take some time if there are new files added")
         self._process_files()
         self.vector_store = self.vector.get_vector_store()
         embedded_querry = self._get_query_embedding(querry)

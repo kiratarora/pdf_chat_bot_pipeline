@@ -6,8 +6,7 @@
         > Windowed Chunking (Use overlapping windows to create chunks, ensuring each chunk has some overlap with the previous one to preserve context)
         > Parargraph Based Chunking (split your text data into individual sentences or paragraphs)
         > Semantic Chunking  (Use a semantic segmentation approach to split the text based on sentence boundaries, paragraphs, or topic changes)
-        > Topic Based Chunking ()
-
+        > Topic Based Chunking (Split when a change in topic is detected)
 '''
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -43,7 +42,13 @@ class Chunker:
         Returns:
                 list of lists: The function returns a list of lists
         '''
-        # def chunkTable(self, data):
+        def chunkTable(self, data):
+                tables = []
+                for table in data:
+                        if type(table) != str:
+                                tables.append(str(table))
+                        else:
+                                tables.append(table)                                
 
         '''
         Function to implement simple fixed length chunking
