@@ -1,6 +1,7 @@
 import pdfplumber, re
 from pypdf import PdfReader 
 from docx import Document
+import pandas as pd
 
 class PDFLoader:
     def __init__(self, file_path):
@@ -50,14 +51,14 @@ class DOCLoader:
         self.file_path = file_path
         self.document = Document(file_path)
         
-    def get_text(self):
+    def extract_text(self):
         text_list = [para.text for para in self.document.paragraphs]
         text = ''
         for i in text_list:
             text += i + '\n'
         return text
 
-    def get_table(self):
+    def extract_table(self):
         # Initialize a list to hold all tables
         tables_data = []
         
@@ -71,33 +72,14 @@ class DOCLoader:
         
         return tables_data
 
+class XLSLoader:
+    def __init__(self, file_path):
+        self.file_path = file_path
+
+    def read_csv(self):
+        return pd.read_csv(self.file_path).values.tolist()
         
+    def read_excel(self, sheet_name):
+        return pd.read_excel(self.file_path, sheet_name=sheet_name).values.tolist()
+
             
-        
-
-
-
-
-
-
-# Example usage
-file_path = 'data/gurgaon.pdf'
-pdf_loader = PDFLoader(file_path)
-pdf_loader.parse_data()
-# # Extract text
-# # text = pdf_loader.extract_plumber_text()
-# text = pdf_loader.extract_reader_text()
-# print("Extracted Text:")
-# print(text)
-
-# # Extract table
-tables = pdf_loader.extract_table()
-for i in tables:
-    print(i)
-
-# file_path = 'data/Transcript -   Understanding your Electricity Bills.docx'
-# doc_loader = DOCLoader(file_path)
-# # print(doc_loader.get_text())
-# tables = doc_loader.get_table()
-# for i in tables:
-#     print(i)

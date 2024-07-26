@@ -42,14 +42,14 @@ class Chunker:
         Returns:
                 list of lists: The function returns a list of lists
         '''
-        def chunkTable(self, data):
+        def chunk_table(self, data):
                 tables = []
                 for table in data:
                         if type(table) != str:
                                 tables.append(str(table))
                         else:
                                 tables.append(table)                                
-
+                return tables
         '''
         Function to implement simple fixed length chunking
 
@@ -186,7 +186,10 @@ class Chunker:
                 return None
 
         def best_chunks(self, data):
-                return self.semantic_chunking(data=data)
+                if data != '':
+                        return self.semantic_chunking(data=data)
+                else:
+                        return ['']
 
 def setup():
         nltk.download('punkt')
