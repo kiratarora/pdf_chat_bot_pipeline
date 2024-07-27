@@ -13,7 +13,6 @@ class PDFLoader:
             for page in pdf.pages:
                 text += page.extract_text(x_tolerance=3, x_tolerance_ratio=None, y_tolerance=3, layout=False, x_density=7.25, y_density=13, line_dir_render=None, char_dir_render=None) + " "
         return text
-        # return page.extract_words(x_tolerance=3, x_tolerance_ratio=None, y_tolerance=3, keep_blank_chars=False, use_text_flow=False, line_dir="ttb", char_dir="ltr", line_dir_rotated="ttb", char_dir_rotated="ltr", extra_attrs=[], split_at_punctuation=False, expand_ligatures=True)
 
     def extract_table(self):
         tables = []
@@ -59,10 +58,8 @@ class DOCLoader:
         return text
 
     def extract_table(self):
-        # Initialize a list to hold all tables
         tables_data = []
         
-        # Iterate through each table in the document
         for table in self.document.tables:
             table_data = []
             for row in table.rows:

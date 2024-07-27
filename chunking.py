@@ -45,11 +45,13 @@ class Chunker:
         def chunk_table(self, data):
                 tables = []
                 for table in data:
-                        if type(table) != str:
-                                tables.append(str(table))
-                        else:
-                                tables.append(table)                                
-                return tables
+                        if len(table) == 0:
+                                continue
+                        title_row = table[0]
+                        for i in range(9,len(table),9):
+                                table.append(title_row+table[i-9:i])                              
+                return str(tables)
+        
         '''
         Function to implement simple fixed length chunking
 
@@ -190,14 +192,6 @@ class Chunker:
                         return self.semantic_chunking(data=data)
                 else:
                         return ['']
-
-def setup():
-        nltk.download('punkt')
-        nltk.download('stopwords')
-# # _____________________________________________________________________________________
-# setup() # Uncomment this function to setup the downloads required to run the function
-# # _____________________________________________________________________________________
-
 
 # step 1: loading the data
 # step 2: chunking the data
