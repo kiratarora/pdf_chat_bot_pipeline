@@ -40,7 +40,7 @@ while True:
         print('downloading......')
         setup()
     chat_history.append("User Input: " + user_input)
-    context = Retriever(['pdf','docx'], path='data').get_context(user_input)
+    context = Retriever(['pdf','docx', 'doc', 'xltx', 'xltm', 'xlt', 'xlsx', 'xlsm', 'xls', 'csv'], path='data').get_context(user_input)
     text_context = context[0]
     table_context = context[1]
     AI_answer = chain.invoke({ "chat_history": chat_history, "input": user_input, "text_context":text_context, "table_context":table_context })

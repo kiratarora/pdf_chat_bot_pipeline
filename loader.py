@@ -3,32 +3,61 @@ from pypdf import PdfReader
 from docx import Document
 import pandas as pd
 
+'''
+Class to load text and tables from a pdf file.
+'''
 class PDFLoader:
-    def __init__(self, file_path):
+
+    '''
+    Setup for the class
+    Parameters:
+        file_path (str): the path of the pdf file that needs to parsed
+    '''
+    def __init__(self, file_path: str) -> None:
         self.file_path = file_path
 
-    def extract_plumber_text(self):
+    '''
+    Funtion to use pdf plumber to optically read text.
+    Returns:
+        str: extracted text
+    '''
+    def extract_plumber_text(self) -> str:
         text = ""
         with pdfplumber.open(self.file_path) as pdf:
             for page in pdf.pages:
                 text += page.extract_text(x_tolerance=3, x_tolerance_ratio=None, y_tolerance=3, layout=False, x_density=7.25, y_density=13, line_dir_render=None, char_dir_render=None) + " "
         return text
-
-    def extract_table(self):
+    
+    '''
+    Funtion to use pdf plumber to optically read tables.
+    Returns:
+        n-D List: extracted tables
+    '''
+    def extract_table(self) -> list[list]:
         tables = []
         with pdfplumber.open(self.file_path) as pdf:
             for page in pdf.pages:
                 tables += page.extract_tables(table_settings={})
         return tables
     
-    def extract_reader_text(self):
+    '''
+    Funtion that uses pdf reader to extract text
+    Returns:
+        str: extracted text
+    '''
+    def extract_reader_text(self) -> str:
         reader = PdfReader(self.file_path) 
         text = ''
         for page in reader.pages:
             text += page.extract_text()
         return text
 
-    def parse_data(self):
+    '''
+    Function that decides the best tool to use for exraction based on pre-defined conditions
+    Returns:
+        str: extracted text
+    '''
+    def parse_data(self) -> str:
         data_reader = self.extract_reader_text()
         data_plumber = self.extract_plumber_text()
         # len (more), chars [#,>,\n] (less)
@@ -44,20 +73,39 @@ class PDFLoader:
             return data_reader
         else:
             return data_plumber
-                 
+
+'''
+Class to load text and tables from a doc file.
+'''          
 class DOCLoader:
-    def __init__(self, file_path):
+    
+    '''
+    Setup for the class
+    Parameters:
+        file_path (str): the path of the pdf file that needs to parsed
+    '''
+    def __init__(self, file_path: str) -> None:
         self.file_path = file_path
         self.document = Document(file_path)
-        
-    def extract_text(self):
+    
+    '''
+    Funtion that uses doc reader to extract text
+    Returns:
+        str: extracted text
+    ''' 
+    def extract_text(self) -> str:
         text_list = [para.text for para in self.document.paragraphs]
         text = ''
         for i in text_list:
             text += i + '\n'
         return text
-
-    def extract_table(self):
+    
+    '''
+    Funtion that uses doc reader to extract table
+    Returns:
+       n-D List: extracted tables
+    ''' 
+    def extract_table(self) -> list[list]:
         tables_data = []
         
         for table in self.document.tables:
@@ -69,14 +117,35 @@ class DOCLoader:
         
         return tables_data
 
+'''
+Class to load tables from a xlsx or a csv file.
+'''   
 class XLSLoader:
-    def __init__(self, file_path):
+    
+    '''
+    Constructor for the class
+    Parameters:
+        file_path (str): the path of the pdf file that needs to parsed
+    '''
+    def __init__(self, file_path: str) -> None:
         self.file_path = file_path
-
-    def read_csv(self):
+    
+    '''
+    Function to load the csv and convert it to a n-D list
+    Returns:
+        n-D list: extracted tables
+    '''
+    def read_csv(self) -> list[list]:
         return pd.read_csv(self.file_path).values.tolist()
-        
-    def read_excel(self, sheet_name):
+    
+    '''
+    Function to load a excel file and convert it to a n-D list
+    Parameter:
+        sheet_name (int): name of the excel sheet
+    Returns:
+        n-D list: extracted tables
+    ''' 
+    def read_excel(self, sheet_name: int = 0) -> list[list]:
         return pd.read_excel(self.file_path, sheet_name=sheet_name).values.tolist()
 
             

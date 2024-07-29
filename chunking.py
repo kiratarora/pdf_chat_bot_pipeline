@@ -11,18 +11,15 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-
-import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
-import string
 from gensim import corpora, models
 
 import math
 
 class Chunker:
         'Function to clean the data in the chunks'
-        def _data_cleaner(self,data,chars_to_remove):
+        def _data_cleaner(self,data: str,chars_to_remove: list[str]) -> str:
                 for i in range(len(data)):
                         data[i] = data[i].rstrip()
                         data[i] = data[i].lstrip()
@@ -42,7 +39,7 @@ class Chunker:
         Returns:
                 list of lists: The function returns a list of lists
         '''
-        def chunk_table(self, data):
+        def chunk_table(self, data: list[list]) -> list[str]:
                 tables = []
                 for table in data:
                         if len(table) == 0:
@@ -61,9 +58,9 @@ class Chunker:
         Returns: 
                 list of strs: returns a list of chunked data strings
         '''
-        def fixed_length_chunking(self,data,size=2000):
+        def fixed_length_chunking(self, data:str, size:int=2000) -> list[str]:
                 return self.window_chunking(data,size,overlap=0)
-
+        
         '''
         this function splits the data based on sliding window chunks meaning they have some overlapping characters
 
@@ -74,9 +71,9 @@ class Chunker:
         Returns:
                 list of strings: list of chunked data
         '''
-        def window_chunking(self,data,size=2000,overlap=500):
+        def window_chunking(self, data:str, size:int=2000, overlap:int=500) -> list[str]:
                 return [data[i:i+size] for i in range(0,len(data),(size-overlap))]
-
+        
         '''
         this function splits the data based on paragraphs (it also limits the max chunk size to 3000 chunks) 
 
@@ -87,7 +84,7 @@ class Chunker:
         Returns:
                 list of strings: list of chunked data
         '''
-        def paragraph_chunking(self,data,size = 2500, delimiter = '\n', add_back_delimiter = False):  
+        def paragraph_chunking(self, data:str, size:int = 2500, delimiter:str = '\n', add_back_delimiter:bool = False) -> list[str]:  
                 chunks = data.split(delimiter)
                 chunks = [i for i in chunks if i!=' '] # removing all the empty characters
                 if add_back_delimiter:
@@ -104,8 +101,8 @@ class Chunker:
                                         limited_chunks.append(i)
                         else:
                                 limited_chunks.append(chunk)
-                return self._data_cleaner(limited_chunks, ['\n'])
-                
+                return self._data_cleaner(limited_chunks, ['\n'])    
+        
         '''
         This function splits the data based on semantic context. 
         The first step is to split the entire data into smaller chunks or tokens and then doing a semantic analysis to finally group the tokens into semantically similar chunks.
@@ -118,7 +115,7 @@ class Chunker:
         Returns:
                 list of strings: retuns a list of strings reprensing the chunked data.
         '''
-        def semantic_chunking(self,data,delimiter='.', chunk_size = 4, chunk_similarity_threshold = 0.3):
+        def semantic_chunking(self, data:str, delimiter:str = '.', chunk_size:int = 4, chunk_similarity_threshold:float = 0.3) -> list[str]:
                 sentences = self.paragraph_chunking(data=data, delimiter=delimiter, add_back_delimiter=True)
                 vectorizer = TfidfVectorizer()
                 tfidf_matrix = vectorizer.fit_transform(sentences)
@@ -133,7 +130,7 @@ class Chunker:
                                 chunks.append(' '.join(chunk_sentences))
                 
                 return chunks
-
+        
         '''
         This function takes the data, splits it based distict on topics. 
 
@@ -144,7 +141,7 @@ class Chunker:
         Returns:
                 list of strings: chunked data
         '''
-        def topic_based_chunking(self, data, num_topics = 5, passes = 15):
+        def topic_based_chunking(self, data: str, num_topics: int = 5, passes: int = 15) -> list[str]:
                 # Preprocessing Data
                 sentences = sent_tokenize(data)
                 stop_words = set(stopwords.words('english'))
@@ -184,10 +181,17 @@ class Chunker:
         '''
         This is a hybrid function that tokenizes the data, then chunks it by joining all the related sentences togeter irrespecive of it's original position. 
         '''
-        def hybrid_chunking():
+        def hybrid_chunking(self):
                 return None
 
-        def best_chunks(self, data):
+        '''
+        Function to return the best chunks based on the different chunking stratergies
+        Parameters:
+                data (str): data to be chunked
+        Returns: 
+                list of strings: chunked data
+        '''
+        def best_chunks(self, data: str) -> list[str]:
                 if data != '':
                         return self.semantic_chunking(data=data)
                 else:

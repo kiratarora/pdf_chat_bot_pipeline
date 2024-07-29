@@ -1,11 +1,19 @@
-from InstructorEmbedding import INSTRUCTOR
 from loader import PDFLoader,DOCLoader, XLSLoader
 from chunking import Chunker
 from embedder import Embedder
 import json
 
+'''
+Class to streamline extractions, chunking, and embedding the data.
+'''
 class Vector_Store():
-    def __init__(self, files:str) -> None:
+
+    '''
+    Constructor for the class
+    Parameters:
+        files (list of str): the address of the files that need to be parseds
+    '''
+    def __init__(self, files:list[str]) -> None:
         self.files = files
         self.chunker = Chunker()
         self.vector_store = self.get_vector_store()
@@ -17,8 +25,13 @@ class Vector_Store():
             self._write_vector_store()
         self.embedder = Embedder()
 
+    '''
+    Function that returns the latest edition of the vector_store.json where all the embedded data is stored.
 
-    def get_vector_store(self):
+    Returns: 
+        dict: the vector store with the embeddings for all the data and tables
+    '''
+    def get_vector_store(self) -> dict:
         file_path = 'vector_store.json'
         try:
             with open(file_path, 'r') as file:
@@ -27,14 +40,24 @@ class Vector_Store():
             data = {}
         return data
 
-    def _write_vector_store(self):
+    '''
+    PRIVATE: function to witre the updated vectore store into the json file
+    '''
+    def _write_vector_store(self) -> None:
         with open('vector_store.json', 'w') as file:
             json.dump(self.vector_store, file, indent=4)
 
     '''
-    This function is the main funtion of the vector_store class. It passes over each file, parses all the data, chunks it, embbeds it and then stores it. 
+    PRIVATE HELPER: this function is the main funtion of the vector_store class. It passes over each file, parses all the data, chunks it, embbeds it and then stores it. 
+    
+    Parameters: 
+        file (list of str): the address of all the files to be processed.
+        flag (bool): flag value that is used to override and re-process a file that has already been processed.
+
+    Returns:
+        str: Confirmation that the file processing was completed.
     '''        
-    def _process_files_helper(self, files, flag):
+    def _process_files_helper(self, files: list[str], flag: bool) -> str:
         # Parsing over all the files
         for file in files:
             if file not in self.vector_store['text'] or flag:
@@ -73,15 +96,48 @@ class Vector_Store():
         self._write_vector_store()
         return 'Files Added'
     
-    def process_files(self):
+    '''
+    Function that processes the files assigned to it at the time of creation of the object
+
+    Returns: 
+        str: Confirmation that the file processing was completed.
+    '''
+    def process_files(self) -> str:
         return self._process_files_helper(files = self.files, flag = False)
 
-    def _doc_type(self, file):
+    '''
+    PRIVATE: function that determines the typr of file
+
+    Parameters:
+        file (str): name of the file
+
+    Retuns:
+        str: extention of the file
+    '''
+    def _doc_type(self, file: str) -> str:
         extention = file.split('.')
         return extention[-1]
 
-    def add_sigle_file(self,file_name):
+    '''
+    Function to add a single file, surpasses the need for a file to not be processes (can re-process already processed files)
+
+    Parameters:
+        file_name (str): address of the file to be reprocessed
+
+    Returns: 
+        str: Confirmation that the file processing was completed.
+    '''
+    def add_sigle_file(self,file_name:str) -> str:
         return self._process_files_helper(flag = True, files = [file_name])
 
-    def get_query_embedding(self,string):
+    '''
+    Function to embed a querry
+
+    Parameters:
+        string (str): used defined querry
+
+    Returns: 
+        list of floats: embedding vector
+    '''
+    def get_query_embedding(self,string:str) -> list[float]:
         return self.embedder.get_query_embedding(string)
