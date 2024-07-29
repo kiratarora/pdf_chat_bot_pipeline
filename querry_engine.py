@@ -19,11 +19,11 @@ prompt = ChatPromptTemplate.from_messages([
 chain = prompt | llm | output_parser
 
 print(''' 
-        ____________________________
+_____________________________________________________________________________________
         Instructions: 
                         Type 'q' or 'quit' to quit.
                         Type 'setup' if running the function for the first time.
-        ____________________________  
+_____________________________________________________________________________________
         
     ''')
 

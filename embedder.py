@@ -1,6 +1,5 @@
 from InstructorEmbedding import INSTRUCTOR
 
-
 '''
 Class that uses hungging face's instructor model to implement custom embedding.
 '''
