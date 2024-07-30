@@ -43,6 +43,12 @@ while True:
     context = Retriever(['pdf','docx', 'doc', 'xltx', 'xltm', 'xlt', 'xlsx', 'xlsm', 'xls', 'csv'], path='data').get_context(user_input)
     text_context = context[0]
     table_context = context[1]
+    # print('')
+    # print(text_context)
+    # print('')
+    # print('')
+    # print(table_context)
+    # print('')
     AI_answer = chain.invoke({ "chat_history": chat_history, "input": user_input, "text_context":text_context, "table_context":table_context })
     print("AI Answer: "+ AI_answer)
     chat_history.append("AI Answer: " + AI_answer)
