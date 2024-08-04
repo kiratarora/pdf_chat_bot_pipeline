@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pdf Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        a {
+            margin-top: 20px;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: white;
+            background-color: #007BFF;
+            border-radius: 5px;
+        }
+        textarea {
+            width: 100%;
+            max-width: 600px;
+            height: 200px;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            max-width: 580px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Chat Bot</h1>
+    <input type="file" id="fileUpload" accept=".pdf">
+    <button id="pdfSend">Upload File</button><br>
+    <textarea id="chatHistory" readonly></textarea><br>
+    <input type="text" id="prompt" placeholder="Type your message here">
+    <div>
+        <button id="sendButton" type="button">Send</button>
+        <input type="radio" id="reloadPdf" name="reloadPdf" value="yes" style="display: none;" >
+    </div>
+
+    <script>
+        document.getElementById('pdfSend').addEventListener('click', function(event) {
+            event.preventDefault();
+
+        
+            const fileInput = document.getElementById('fileUpload');
+            if (fileInput.files.length === 0) {
+                alert('No file selected');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('http://127.0.0.1:5000/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.success) {
+                    alert('File uploaded successfully');
+                } else {
+                    alert('Failed to upload file');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+            document.getElementById('reloadPdf').checked = true;
+        });
+        
+        document.getElementById('sendButton').addEventListener('click', function(event) {
+            event.preventDefault();
+            
+            console.log("Test")
+            const prompt = document.getElementById('prompt').value;
+            const reload = document.getElementById('reloadPdf').checked;
+            document.getElementById('reloadPdf').checked = false;
+
+            message = JSON.stringify({ reload: reload, prompt: prompt, chat_history:chat_history })
+
+            fetch('http://127.0.0.1:5000/pdfQuestions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: message
+            })
+            .then(response => response.json())
+            .then(data => {
+                let objData = data.response
+                console.log(objData)
+                document.getElementById('prompt').value = '';
+
+                userPrompt = "User: "+ prompt
+                Ai_response = "AI response: "+ objData
+                chat_history.push(userPrompt)
+                chat_history.push(Ai_response)
+                display();
+            })
+                
+        });
+
+        function display() {
+            const chatHistoryTextarea = document.getElementById('chatHistory');
+            chatHistoryTextarea.value = chat_history.join('\n\n');
+            chatHistoryTextarea.scrollTop = chatHistoryTextarea.scrollHeight;
+        }
+
+        let chat_history = []
+
+    </script>
+</body>
+</html>
