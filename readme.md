@@ -46,10 +46,6 @@ A function to chunk table data, used to separate tables into chunks. This functi
 - **Semantic Chunking:** This method uses semantic analysis to split the text based on meaning, ensuring that each chunk represents a coherent unit of thought.
 - **Topic Based Chunking:** The text is split whenever a significant change in topic is detected. 
 
-### Hybrid Chunking Algorithm
-
-Currently in development, this algorithm groups tokens based on their underlying topic defined by a self-implented `Latent Dirichlet Allocation (LDA)` technique, combining the strengths of both topic-based and semantic chunking.
-
 
 ### Libraries Used:
 - `sklearn`: Provides tools for vectorization and similarity computations, which are integral to semantic and topic-based chunking.
